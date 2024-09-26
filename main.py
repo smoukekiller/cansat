@@ -22,7 +22,7 @@ class Win:
         for name, value in self.data.items(): 
             label = tk.Label(self.data_frame, text=f"{name}:{value}", font=("Arial", 12), bg="lightgrey")
             label.pack(side="top", anchor="nw")
-        self.marker_of_prediction.set_position(self.dxata["latitude"], self.data["longitude"])
+        self.marker_of_prediction.set_position(self.data["latitude"], self.data["longitude"])
 
 
     def __init__(self) -> None:
