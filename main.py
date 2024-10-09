@@ -3,16 +3,49 @@ import tkinter as tk
 import threading
 import serial
 import time
+
+
+#sigma constants
+TEMPERATURE = 0x00
+PRESSURE = 0x01
+LATITUDE = 0x02
+LONGITUDE = 0x03
+ACCELERATION_X = 0x04
+ACCELERATION_Y = 0x05
+ACCELERATION_Z = 0x06
+GYRO_X = 0x07
+GYRO_Y = 0x08
+GYRO_Z = 0x09
+LIGHT = 0x0A
+BASEB = 0x0B
+
+
+
 #sigma main class
 class Win:
+
+    def PrintData(self) -> None:
+        print("temperature:", self.rawdata[TEMPERATURE])
+        print("pressure:", self.rawdata[PRESSURE])
+        print("latitude:", self.rawdata[LATITUDE])
+        print("longitude:", self.rawdata[LONGITUDE])
+        print("acceleration_x:", self.rawdata[ACCELERATION_X])
+        print("acceleration_y:", self.rawdata[ACCELERATION_Y])
+        print("acceleration_z:", self.rawdata[ACCELERATION_Z])
+        print("gyro_x:", self.rawdata[GYRO_X])
+        print("gyro_y:", self.rawdata[GYRO_Y])
+        print("gyro_z:", self.rawdata[GYRO_Z])
+        print("light:", self.rawdata[LIGHT])
+        print("baseb:", self.rawdata[BASEB])
+
+
 
     #new skibidi update function
     def update(self) -> None:
         for widget in self.data_frame.winfo_children():
             widget.destroy()
         self.write_data()
-
-        self.data["predicted latitude"] = round(self.data["predicted latitude"] + 0.001, 6)
+        self.PrintData()
         self.root.after(1000, self.update)
 
     #sigma data
@@ -35,7 +68,35 @@ class Win:
         data = self.ser.readline().decode('utf-8').strip()
         
 
+        self.rawdata = [
+            0.0, #Temperature
+            0.0, #Pressure
+            63.0, #Latitude
+            0, #Longitude
+            0, #accel X
+            0, #accel Y
+            0, #accel Z
+            0, #Gyro X
+            0, #Gyro Y
+            0, #Gyro Z
+            0, #Light 
+            0, #Base p
+        ]
 
+        self.rawdatatimestpams = [
+            0, #Temperature
+            0, #Pressure
+            0, #Latitude
+            0, #Longitude
+            0, #accel X
+            0, #accel Y
+            0, #accel Z
+            0, #Gyro X
+            0, #Gyro Y
+            0, #Gyro Z
+            0, #Light 
+            0, #Base p
+        ]
 
 
 
@@ -86,17 +147,11 @@ class Win:
         while True:
             data = self.ser.readline().decode('utf-8').strip()
             if data:
-                print(f"Received data: {data}")
-                if (data[0:4] == "DATA"):
-                    pass
-                elif (data[0:11] == "Coordinates"):
-                    data = data.replace("Coordinates:", "")
-                    arr = data.split(",")
-                    print(arr)
-                    self.data["gpstimer"] = int(arr[0])
-                    self.data["latitude"] = float(arr[1])
-                    self.data["longitude"] = float(arr[2])
-                    
+
+                arr = data.split(" ")
+                self.rawdata[int(arr[0])] = float(arr[2])
+                self.rawdatatimestpams[int(arr[0])] = int(arr[1])
+                
 
 
 
