@@ -51,11 +51,13 @@ class Win:
     #sigma data
     def write_data(self) -> None:
 
-
-        for name, value in self.data.items(): 
-            label = tk.Label(self.data_frame, text=f"{name}:{value}", font=("Arial", 12), bg="lightgrey")
-            label.pack(side="top", anchor="nw")
-        self.marker_of_prediction.set_position(self.data["latitude"], self.data["longitude"])
+        for i in range(len(self.datanames)):
+            label = tk.Label(self.data_frame, text=f"{self.datanames[i]}{self.rawdata[i]}", font=("Arial", 12), bg="lightgrey")
+            label.pack(anchor="nw")
+        # for name, value in self.data.items(): 
+        #     label = tk.Label(self.data_frame, text=f"{name}:{value}", font=("Arial", 12), bg="lightgrey")
+        #     label.pack(side="top", anchor="nw")
+        self.marker_of_prediction.set_position(self.rawdata[LATITUDE], self.rawdata[LONGITUDE])
 
 
     def __init__(self) -> None:
@@ -66,7 +68,22 @@ class Win:
         self.timer = time.time()
         self.ser = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=1)
         data = self.ser.readline().decode('utf-8').strip()
-        
+    
+        self.datanames = [
+            "Temperature:",
+            "Pressure:",
+            "Latitude:",
+            "Longitude:",
+            "Accel X:",
+            "Accel Y:",
+            "Accel Z:",
+            "Gyro X:",
+            "Gyro Y:",
+            "Gyro Z:",
+            "Light:",
+            "Base Pressure:"
+        ]
+
 
         self.rawdata = [
             0.0, #Temperature
@@ -100,17 +117,8 @@ class Win:
 
 
 
-        if data:
-            print(f"Received data: {data}")
-        self.data = {
-            "predicted latitude": 63.094227,
-            "predicted longitude": 21.608214,
-            "latitude": 63.094227,
-            "longitude": 21.608214,
-            "velocity": 0,
-            "altitude": 0,
-            "gpstime": 0
-        }            
+
+
         self.zoom = 15
         #coordinates 
         self.start_latitude, self.start_longitude = 63.094227, 21.608214
@@ -135,7 +143,7 @@ class Win:
         self.map_widget.set_position(self.start_latitude, self.start_longitude)  # San Francisco coordinates
         self.map_widget.set_zoom(self.zoom)
 
-        self.marker_of_prediction = self.map_widget.set_marker(self.data["predicted latitude"], self.data["predicted longitude"])
+        self.marker_of_prediction = self.map_widget.set_marker(0,0)
         
         self.thread = threading.Thread(target=self.ReadSerial, args=(), daemon=True)
         self.thread.start()
